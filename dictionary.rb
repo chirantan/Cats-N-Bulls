@@ -15,7 +15,9 @@ class Dictionary
       :not_containing => [],
       :cats => nil,
       :bulls => nil,
-      :with => nil
+      :with => nil,
+      :order => nil,
+      :direction => :asc
     }.update(given_options)
     
     matches = WORDS
@@ -49,7 +51,7 @@ class Dictionary
       cat_match = Word.new(options[:with])
       matches = 
       matches.collect do |match|
-        match if Word.new(match).cats(cat_match) == cats
+        match if Word.new(match).cats_with(cat_match) == cats
       end.compact!
     end
 
@@ -58,8 +60,22 @@ class Dictionary
       bull_match = Word.new(options[:with])
       matches =
         matches.collect do |match|
-        match if Word.new(match).bulls(bull_match) == bulls
+        match if Word.new(match).bulls_with(bull_match) == bulls
       end.compact!
+    end
+
+    if options[:order]
+      matches =
+      case options[:order]
+      when :alpha
+        matches.sort
+      when :most_likely
+        matches.sort {|m1, m2| occurence_weight(m1) <=>  occurence_weight(m2)}
+      end
+    end
+
+    if options[:direction] == :desc
+      matches = matches.reverse
     end
 
     return case collection
@@ -82,5 +98,8 @@ class Dictionary
     end
     occurences
   end
-end
 
+  def self.occurence_weight(word)
+    Word.new(word).occurence_weight
+  end
+end
