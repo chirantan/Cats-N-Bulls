@@ -99,7 +99,5 @@ class Dictionary < ThingsWithWords
       end
 
     end
-
   end
-  
 end

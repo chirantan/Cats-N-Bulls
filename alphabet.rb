@@ -22,12 +22,4 @@ class Alphabet
   def weight
   end
 
-  def self.occurence_hash
-    o_h = {}
-    ALL.each do |alphabet|
-      o_h[alphabet] = Alphabet.new(alphabet).occurences.size
-    end
-    o_h.sort
-  end
-	
 end

@@ -1,16 +1,18 @@
 require 'alphabet'
 
 class Word
+
+  GAME_WORD_LENGTH = 4
+  
   attr_accessor :value, :cats, :bulls
   attr_reader :occurence_weight
   
   STARTING = 'IDEA'
   
   def initialize(word)
-    raise 'word has to be of length 4' if word.nil? || word.length != 4
+    raise "Word has to be of length #{GAME_WORD_LENGTH}" if word.nil? || word.length != GAME_WORD_LENGTH
     @value = word
-    @cats = nil
-    @bulls = nil
+    @cats = @bulls = nil
     @occurence_weight = calculate_occurence_weight
   end
   
@@ -40,8 +42,10 @@ class Word
   def bulls_with(word)
     raise "word to be matched for bulls has to be on class Word. Given word was #{word}" unless word.instance_of? Word
     bull = 0
-    for i in 0...self.letters.size
-      bull += 1 if self.letters[i] == word.letters[i]
+    own_letters = letters
+    word_letters = word.letters
+    for i in 0...GAME_WORD_LENGTH
+      bull += 1 if own_letters[i] == word_letters[i]
     end
     bull
   end
@@ -53,7 +57,9 @@ class Word
   end
 
   def calculate_occurence_weight
-    alphabets.collect(&:occurence_count).sum
+    alphabets.collect(&:occurence_count).inject do |occerence_count, result|
+      result += occerence_count
+    end
   end
 
   def includes_any?(vals)
@@ -69,9 +75,17 @@ class Word
   end
 
   def better_than?(word)
-    @cats >= word.cats && @bulls >= word.bulls || @bulls >= word.bulls
+    return true if !word || self == word || (@cats == 0  && @bulls == 0)
+    @cats > word.cats && @bulls > word.bulls || @bulls > word.bulls
+  end
+
+  class << self
+    def find_by_value(value)
+      Dictionary::WORDS.each do |word|
+        return word if word.value == value
+      end
+    end
   end
   
 end
-
 
