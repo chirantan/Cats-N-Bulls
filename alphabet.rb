@@ -8,7 +8,7 @@ class Alphabet
 	
   def initialize name
     @name = name.upcase
-    @occurence_count = occurences.size
+    @occurence_count = occurences
   end
 	
   def vowel?

@@ -29,11 +29,12 @@ class Dictionary < ThingsWithWords
         :cats => nil,
         :bulls => nil,
         :with => nil,
+        :candidate_words => Dictionary::WORDS,
         :order => nil,
         :direction => :asc
       }.update(given_options)
 
-      matches = WORDS
+      matches = options[:candidate_words]
 
       if !options[:containing_any].empty?
         containing_any = options[:containing_any]
@@ -97,15 +98,6 @@ class Dictionary < ThingsWithWords
       when :count then matches.size
       end
 
-    end
-
-    def occurence_count(alphabet)
-      alphabet = Alphabet.new(alphabet.upcase)
-      alphabet.occurences.size
-    end
-
-    def occurence_weight(word)
-      Word.new(word).occurence_weight
     end
 
   end

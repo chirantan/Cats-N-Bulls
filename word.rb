@@ -18,7 +18,8 @@ class Word
     options = {
       :cats => @cats,
       :bulls => @bulls,
-      :order => :most_likely
+      :order => :most_likely,
+      :direction => :desc
     }.update(options)
     Dictionary.find(:all, options)
   end
@@ -65,6 +66,10 @@ class Word
 
   def include?(letter)
     @value.include? letter
+  end
+
+  def better_than?(word)
+    @cats >= word.cats && @bulls >= word.bulls || @bulls >= word.bulls
   end
   
 end
