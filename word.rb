@@ -2,11 +2,10 @@ require 'alphabet'
 
 class Word
 
-  GAME_WORD_LENGTH = 4
-  
   attr_accessor :value, :cats, :bulls
   attr_reader :occurence_weight
-  
+
+  GAME_WORD_LENGTH = 4
   STARTING = 'IDEA'
   
   def initialize(word)
@@ -26,8 +25,10 @@ class Word
     Dictionary.find(:all, options)
   end
 
+  # => Not used right now. But will be used when the program will be choosing
+  # => the word and user will be guessing.
   def match(word)
-    return cats(word), bulls(word)
+    return cats_with(word), bulls_with(word)
   end
   
   def letters
@@ -56,18 +57,12 @@ class Word
     end
   end
 
-  def calculate_occurence_weight
-    alphabets.collect(&:occurence_count).inject do |occerence_count, result|
-      result += occerence_count
-    end
-  end
-
   def includes_any?(vals)
-    return true if vals.empty? || vals.any? {|val| @value.include?(val)}
+    vals.empty? || vals.any? {|val| @value.include?(val)}
   end
 
   def includes_all?(vals)
-    return true if vals.empty? || !vals.collect {|val| @value.include?(val)}.include?(false)
+    vals.empty? || !vals.collect {|val| @value.include?(val)}.include?(false)
   end
 
   def include?(letter)
@@ -76,7 +71,7 @@ class Word
 
   def better_than?(word)
     return true if !word || self == word || (@cats == 0  && @bulls == 0)
-    @cats > word.cats && @bulls > word.bulls || @bulls > word.bulls
+    (@cats > word.cats && @bulls >= word.bulls) || @bulls > word.bulls
   end
 
   class << self
@@ -86,6 +81,15 @@ class Word
       end
     end
   end
-  
+
+  private
+
+    def calculate_occurence_weight
+    alphabets.collect(&:occurence_count).inject do |occerence_count, result|
+      result += occerence_count
+    end
+  end
+
 end
 
+require 'dictionary'

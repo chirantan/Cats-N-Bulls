@@ -19,7 +19,4 @@ class Alphabet
     OCCURENCES[@name]
   end
 	
-  def weight
-  end
-
 end
