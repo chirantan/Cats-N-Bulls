@@ -3,103 +3,111 @@ require 'word'
 require 'alphabet'
 require 'test/unit'
 
-class Dictionary
+class ThingsWithWords
+  class << self
+    def fetch_words
+      puts 'Warming up... Think of your 4 letter word meanwhile.'
+      all_words = File.open('words', 'r').read.strip.split(' ').compact
+      all_words.collect do |word|
+        Word.new(word) if word.split('').uniq.size == 4
+      end.compact.uniq
+    end
+  end
+end
+
+class Dictionary < ThingsWithWords
   
-  WORDS = File.open('words', 'r').read.strip.split(' ').compact
+  WORDS = fetch_words
   TEXT = ' ' + WORDS.join(' ')
-  
-  def self.find(collection, given_options = {})
-    options = {
-      :containing_any => [],
-      :containing_all => [],
-      :not_containing => [],
-      :cats => nil,
-      :bulls => nil,
-      :with => nil,
-      :order => nil,
-      :direction => :asc
-    }.update(given_options)
-    
-    matches = WORDS
 
-    if !options[:containing_any].empty?
-      containing_any = options[:containing_any]
-      matches = 
-        matches.collect do |match|
-        match.includes_any(containing_any)
-      end.compact!
-    end
-    
-    if !options[:containing_all].empty?
-      containing_all = options[:containing_all]
-      matches = 
-        matches.collect do |match|
-        match.includes_all(containing_all)
-      end.compact!
-    end
-    
-    if !options[:not_containing].empty?
-      not_containing = options[:not_containing]
-      matches = 
-        matches.collect do |match|
-        match if !match.includes_any(not_containing)
-      end.compact!
-    end
+  class << self
+    def find(collection, given_options = {})
+      options = {
+        :containing_any => [],
+        :containing_all => [],
+        :not_containing => [],
+        :cats => nil,
+        :bulls => nil,
+        :with => nil,
+        :order => nil,
+        :direction => :asc
+      }.update(given_options)
 
-    if options[:cats] && options[:with]
-      cats  = options[:cats]
-      cat_match = Word.new(options[:with])
-      matches = 
-      matches.collect do |match|
-        match if Word.new(match).cats_with(cat_match) == cats
-      end.compact!
-    end
+      matches = WORDS
 
-    if options[:bulls] && options[:with]
-      bulls  = options[:bulls]
-      bull_match = Word.new(options[:with])
-      matches =
-        matches.collect do |match|
-        match if Word.new(match).bulls_with(bull_match) == bulls
-      end.compact!
-    end
-
-    if options[:order]
-      matches =
-      case options[:order]
-      when :alpha
-        matches.sort
-      when :most_likely
-        matches.sort {|m1, m2| occurence_weight(m1) <=>  occurence_weight(m2)}
+      if !options[:containing_any].empty?
+        containing_any = options[:containing_any]
+        matches =
+          matches.collect do |match|
+          match if match.includes_any?(containing_any)
+        end.compact.uniq
       end
+
+      if !options[:containing_all].empty?
+        containing_all = options[:containing_all]
+        matches =
+          matches.collect do |match|
+          match if match.includes_all?(containing_all)
+        end.compact.uniq
+      end
+
+      if !options[:not_containing].empty?
+        not_containing = options[:not_containing]
+        matches =
+          matches.collect do |match|
+          match if !match.includes_any?(not_containing)
+        end.compact.uniq
+      end
+
+      if options[:cats] && options[:with]
+        cats  = options[:cats]
+        cat_match = Word.new(options[:with])
+        matches =
+          matches.collect do |match|
+          match if match.cats_with(cat_match) == cats
+        end.compact.uniq
+      end
+
+      if options[:bulls] && options[:with]
+        bulls  = options[:bulls]
+        bull_match = Word.new(options[:with])
+        matches =
+          matches.collect do |match|
+          match if match.bulls_with(bull_match) == bulls
+        end.compact.uniq
+      end
+
+      if options[:order]
+        matches =
+          case options[:order]
+        when :alpha
+          matches.uniq.sort_by(&:value)
+        when :most_likely
+          matches.uniq.sort_by(&:occurence_weight)
+        end
+      end
+
+      if options[:direction] == :desc
+        matches = matches.uniq.reverse
+      end
+
+      return case collection
+      when :first then matches.first
+      when :all then matches
+      when :count then matches.size
+      end
+
     end
 
-    if options[:direction] == :desc
-      matches = matches.reverse
+    def occurence_count(alphabet)
+      alphabet = Alphabet.new(alphabet.upcase)
+      alphabet.occurences.size
     end
 
-    return case collection
-    when :first then matches.first
-    when :all then matches
-    when :count then matches.size
+    def occurence_weight(word)
+      Word.new(word).occurence_weight
     end
-    
+
   end
   
-  def self.occurence_count(alphabet)
-    alphabet = Alphabet.new(alphabet.upcase)
-    alphabet.occurences.size
-  end
-
-  def self.occurence_hash
-    occurences = {}
-    Word::LETTERS.each do |letter|
-      occurences.store(letter, occurence_count(letter))
-    end
-    occurences
-  end
-
-  def self.occurence_weight(word)
-    Word.new(word).occurence_weight
-  end
 end

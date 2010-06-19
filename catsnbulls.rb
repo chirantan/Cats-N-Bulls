@@ -6,6 +6,7 @@ class CatsNBulls
   def initialize
     @used_words = []
     @exclude_words_with = []
+    @candidate_words = Dictionary::WORDS
   end
   
   def start
@@ -32,10 +33,8 @@ class CatsNBulls
   end
   
   def next_word
-    p 'Calculating next word'
-    candidate_words = current_word.similar_words(:not_containing => @exclude_words_with) - @used_words.collect(&:value)
-    @used_words << Word.new(candidate_words.first)
-    p 'Done'
+    @candidate_words = (current_word.similar_words(:not_containing => @exclude_words_with) - @used_words) & @candidate_words
+    @used_words << @candidate_words.first
     suggest_current_word
   end
 end

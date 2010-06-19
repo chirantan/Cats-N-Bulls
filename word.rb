@@ -2,6 +2,7 @@ require 'alphabet'
 
 class Word
   attr_accessor :value, :cats, :bulls
+  attr_reader :occurence_weight
   
   STARTING = 'IDEA'
   
@@ -10,6 +11,7 @@ class Word
     @value = word
     @cats = nil
     @bulls = nil
+    @occurence_weight = calculate_occurence_weight
   end
   
   def similar_words(options)
@@ -18,8 +20,7 @@ class Word
       :bulls => @bulls,
       :order => :most_likely
     }.update(options)
-    words = Dictionary.find(:all, options)
-    words
+    Dictionary.find(:all, options)
   end
 
   def match(word)
@@ -32,7 +33,7 @@ class Word
   
   def cats_with(word)
     raise "word to be matched for cats has to be on class Word. Given word was #{word}" unless word.instance_of? Word
-    (self.letters & word.letters).size - bulls(word)
+    (self.letters & word.letters).size - bulls_with(word)
   end
   
   def bulls_with(word)
@@ -50,8 +51,20 @@ class Word
     end
   end
 
-  def occurence_weight
+  def calculate_occurence_weight
     alphabets.collect(&:occurence_count).sum
+  end
+
+  def includes_any?(vals)
+    return true if vals.empty? || vals.any? {|val| @value.include?(val)}
+  end
+
+  def includes_all?(vals)
+    return true if vals.empty? || !vals.collect {|val| @value.include?(val)}.include?(false)
+  end
+
+  def include?(letter)
+    @value.include? letter
   end
   
 end
