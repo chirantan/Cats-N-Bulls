@@ -1,4 +1,3 @@
-require 'monkey_patching'
 require 'word'
 require 'dictionary'
 
@@ -51,6 +50,10 @@ class CatsNBulls
     end
     @used_words << @candidate_words.first
     suggest_current_word
+  end
+
+  def find_in_used_words(cats, bulls)
+    @used_words.collect {|used_word| used_word if used_word.cats == cats && used_word.bulls == bulls }.compact
   end
 
   private
