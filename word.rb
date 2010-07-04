@@ -19,8 +19,8 @@ class Word
     options = {
       :cats => @cats,
       :bulls => @bulls,
-      :order => :most_likely,
-      :direction => :desc
+      :sort => :most_likely,
+      :order => :desc
     }.update(options)
     Dictionary.find(:all, options)
   end
@@ -30,7 +30,7 @@ class Word
   def match(word)
     return cats_with(word), bulls_with(word)
   end
-  
+
   def letters
     @value.to_s.split('')
   end
@@ -81,6 +81,8 @@ class Word
       end
     end
   end
+
+   'idea'
 
   private
 

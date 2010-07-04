@@ -1,9 +1,9 @@
-require 'monkey_patching'
 require 'word'
 require 'alphabet'
 require 'test/unit'
 
 class ThingsWithWords
+
   class << self
     def fetch_words
       puts 'Warming up... Think of your 4 letter word meanwhile.'
@@ -13,6 +13,7 @@ class ThingsWithWords
       end.compact.uniq
     end
   end
+  
 end
 
 class Dictionary < ThingsWithWords
@@ -30,8 +31,8 @@ class Dictionary < ThingsWithWords
         :bulls => nil,
         :with => nil,
         :candidate_words => Dictionary::WORDS,
-        :order => nil,
-        :direction => :asc
+        :sort => nil,
+        :order => :asc
       }.update(given_options)
 
       matches = options[:candidate_words]
@@ -78,9 +79,9 @@ class Dictionary < ThingsWithWords
         end.compact.uniq
       end
 
-      if options[:order]
+      if options[:sort]
         matches =
-          case options[:order]
+          case options[:sort]
         when :alpha
           matches.uniq.sort_by(&:value)
         when :most_likely
@@ -88,7 +89,7 @@ class Dictionary < ThingsWithWords
         end
       end
 
-      if options[:direction] == :desc
+      if options[:order] == :desc
         matches = matches.uniq.reverse
       end
 

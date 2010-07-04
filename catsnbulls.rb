@@ -10,7 +10,7 @@ class CatsNBulls
   end
   
   def start
-    @used_words << Word.new(Word::STARTING)
+    @used_words << Word.find_by_value(Word::STARTING)
     suggest_current_word
   end
   
