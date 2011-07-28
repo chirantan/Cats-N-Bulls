@@ -1,4 +1,3 @@
-require 'word'
 require 'dictionary'
 
 class CatsNBulls

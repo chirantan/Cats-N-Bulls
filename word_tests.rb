@@ -1,4 +1,4 @@
-require 'word'
+require 'dictionary'
 
 require 'test/unit'
 

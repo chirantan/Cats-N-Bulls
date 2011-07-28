@@ -2,21 +2,21 @@ require 'word'
 require 'alphabet'
 require 'test/unit'
 
-class ThingsWithWords
+class WordCollection
 
   class << self
     def fetch_words
-      puts 'Warming up... Think of your 4 letter word meanwhile.'
+      puts "Warming up... Think of your #{Word::GAME_WORD_LENGTH} letter word meanwhile."
       all_words = File.open('words', 'r').read.strip.split(' ').compact
       all_words.collect do |word|
-        Word.new(word) if word.split('').uniq.size == 4
+        Word.new(word) if word.split('').uniq.size == Word::GAME_WORD_LENGTH
       end.compact.uniq
     end
   end
   
 end
 
-class Dictionary < ThingsWithWords
+class Dictionary < WordCollection
   
   WORDS = fetch_words
   TEXT = ' ' + WORDS.join(' ')

@@ -25,23 +25,25 @@ class Word
     Dictionary.find(:all, options)
   end
 
-  # => Not used right now. But will be used when the program will be choosing
-  # => the word and user will be guessing.
   def match(word)
-    return cats_with(word), bulls_with(word)
+    word_bulls = bulls_with(word)
+    word_cats = common_letter_count(word) - bulls
+    [word_cats, word_bulls]
   end
 
   def letters
-    @value.to_s.split('')
+    @letters ||= @value.to_s.split('')
   end
   
   def cats_with(word)
-    raise "word to be matched for cats has to be on class Word. Given word was #{word}" unless word.instance_of? Word
-    (self.letters & word.letters).size - bulls_with(word)
+    common_letter_count(word) - bulls_with(word)
+  end
+
+  def common_letter_count(word)
+    (letters & word.letters).size
   end
   
   def bulls_with(word)
-    raise "word to be matched for bulls has to be on class Word. Given word was #{word}" unless word.instance_of? Word
     bull = 0
     own_letters = letters
     word_letters = word.letters
@@ -52,8 +54,9 @@ class Word
   end
   
   def alphabets
-    letters.collect do |letter|
-      Alphabet.new(letter)
+    @alphabets ||=
+      letters.collect do |letter|
+        Alphabet.new(letter)
     end
   end
 
@@ -82,16 +85,12 @@ class Word
     end
   end
 
-   'idea'
-
   private
 
-    def calculate_occurence_weight
+  def calculate_occurence_weight
     alphabets.collect(&:occurence_count).inject do |occerence_count, result|
       result += occerence_count
     end
   end
 
 end
-
-require 'dictionary'
