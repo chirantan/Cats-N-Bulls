@@ -2,8 +2,8 @@ require 'alphabet'
 
 class Word
 
-  attr_accessor :value, :cats, :bulls
-  attr_reader :occurence_weight
+  attr_accessor :cats, :bulls
+  attr_reader :occurence_weight, :value
 
   GAME_WORD_LENGTH = 4
   STARTING = 'IDEA'
@@ -27,7 +27,7 @@ class Word
 
   def match(word)
     word_bulls = bulls_with(word)
-    word_cats = common_letter_count(word) - bulls
+    word_cats = common_letter_count(word) - word_bulls
     [word_cats, word_bulls]
   end
 
@@ -44,13 +44,7 @@ class Word
   end
   
   def bulls_with(word)
-    bull = 0
-    own_letters = letters
-    word_letters = word.letters
-    for i in 0...GAME_WORD_LENGTH
-      bull += 1 if own_letters[i] == word_letters[i]
-    end
-    bull
+    (0...value.size).count {|i| value[i] == word.value[i]}
   end
   
   def alphabets
@@ -79,9 +73,7 @@ class Word
 
   class << self
     def find_by_value(value)
-      Dictionary::WORDS.each do |word|
-        return word if word.value == value
-      end
+      Dictionary.find_word(value)
     end
   end
 

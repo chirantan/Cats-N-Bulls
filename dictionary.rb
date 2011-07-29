@@ -100,5 +100,9 @@ class Dictionary < WordCollection
       end
 
     end
+
+    def find_word(value)
+      WORDS.find {|word| word.value == value}
+    end
   end
 end

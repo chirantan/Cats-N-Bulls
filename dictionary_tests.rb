@@ -51,4 +51,9 @@ class DictionaryTests < Test::Unit::TestCase
     assert_equal 1, match_count
 
   end
+
+  def test_find_word
+    @acme = Dictionary.find_word('ACME')
+    assert_equal @acme.value, 'ACME'
+  end
 end
